@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporal Flux</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Rajdhani', sans-serif;
+            position: relative;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .overlay-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 60px;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .life-counter {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px 40px;
+            box-shadow: 0 0 60px rgba(255, 0, 100, 0.3);
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 60px rgba(255, 0, 100, 0.3); }
+            50%       { box-shadow: 0 0 80px rgba(255, 0, 100, 0.6); }
+        }
+
+        .counter-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .counter-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: colorShift 8s ease infinite;
+        }
+
+        @keyframes colorShift {
+            0%, 100% { background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0); -webkit-background-clip: text; background-clip: text; }
+            33%       { background: linear-gradient(135deg, #40e0d0, #ff0080, #ff8c00); -webkit-background-clip: text; background-clip: text; }
+            66%       { background: linear-gradient(135deg, #ff8c00, #40e0d0, #ff0080); -webkit-background-clip: text; background-clip: text; }
+        }
+
+        .time-display { text-align: right; }
+
+        .current-time {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow:
+                0 0 20px rgba(255, 255, 255, 0.8),
+                0 0 40px rgba(64, 224, 208, 0.6),
+                0 0 60px rgba(255, 0, 128, 0.4);
+            letter-spacing: 8px;
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92%            { transform: translate(-2px, 2px); }
+            94%            { transform: translate(2px, -2px); }
+            96%            { transform: translate(-2px, -2px); }
+            98%            { transform: translate(2px, 2px); }
+        }
+
+        .date-display {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .center-section {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 15;
+        }
+
+        .quote-container {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(30px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            padding: 60px 80px;
+            max-width: 1000px;
+            box-shadow:
+                0 0 100px rgba(255, 0, 128, 0.4),
+                inset 0 0 100px rgba(64, 224, 208, 0.1);
+            animation: floatAnimation 6s ease-in-out infinite;
+        }
+
+        @keyframes floatAnimation {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-20px); }
+        }
+
+        .quote-text {
+            font-size: 2.5rem;
+            line-height: 1.4;
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 30px;
+            animation: textGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes textGlow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+            50%       { text-shadow: 0 0 40px rgba(255, 255, 255, 0.8); }
+        }
+
+        .quote-author {
+            font-size: 1.3rem;
+            color: rgba(255, 140, 0, 0.9);
+            font-style: italic;
+            letter-spacing: 2px;
+        }
+
+        .bottom-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            animation: statPulse 3s ease-in-out infinite;
+        }
+
+        .stat-box:nth-child(1) { animation-delay: 0s; }
+        .stat-box:nth-child(2) { animation-delay: 1s; }
+        .stat-box:nth-child(3) { animation-delay: 2s; }
+
+        @keyframes statPulse {
+            0%, 100% { border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 0 20px rgba(64, 224, 208, 0.2); }
+            50%       { border-color: rgba(64, 224, 208, 0.5);  box-shadow: 0 0 40px rgba(64, 224, 208, 0.5); }
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #40e0d0, #ff8c00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .warning-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #ff0080;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-align: right;
+            text-shadow: 0 0 20px rgba(255, 0, 128, 0.8);
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1;   }
+            25%, 75%      { opacity: 0.3; }
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0.3;
+        }
+
+        .vignette {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+            pointer-events: none;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="vignette"></div>
+    <div class="scanlines"></div>
+    
+    <div class="overlay-content">
+        <div class="top-section">
+            <div class="life-counter">
+                <div class="counter-label" id="daysLabel">Days Lived</div>
+                <div class="counter-value" id="daysLived">—</div>
+            </div>
+            
+            <div class="time-display">
+                <div class="current-time" id="time">00:00:00</div>
+                <div class="date-display" id="date">Loading...</div>
+            </div>
+        </div>
+
+        <div class="center-section">
+            <div class="quote-container">
+                <div class="quote-text" id="quote">Time is the coin of your life. You spend it. Do not allow others to spend it for you.</div>
+                <div class="quote-author" id="author">— Carl Sandburg</div>
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" id="hoursToday">0</div>
+                    <div class="stat-label">Hours Today</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="dayOfYear">0</div>
+                    <div class="stat-label">Day of Year</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="weekOfYear">0</div>
+                    <div class="stat-label">Week of Year</div>
+                </div>
+            </div>
+            
+            <div class="warning-text">⚠ TIME IS NON-RENEWABLE ⚠</div>
+        </div>
+    </div>
+
+    <script>
+        // ── Canvas / Particle Engine ──────────────────────────────────────────
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width  = canvas.width  = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x     = Math.random() * width;
+                this.y     = Math.random() * height;
+                this.vx    = (Math.random() - 0.5) * 2;
+                this.vy    = (Math.random() - 0.5) * 2;
+                this.size  = Math.random() * 3 + 1;
+                this.life  = 1;
+                this.decay = Math.random() * 0.005 + 0.002;
+                this.color = `hsl(${Math.random() * 60 + 180}, 100%, 60%)`;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+                if (this.life <= 0 || this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha   = this.life;
+                ctx.fillStyle     = this.color;
+                ctx.shadowBlur    = 20;
+                ctx.shadowColor   = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Wave {
+            constructor(speed) { this.y = 0; this.speed = speed; this.amplitude = 50; this.frequency = 0.01; this.phase = 0; }
+            update() { this.y += this.speed; this.phase += 0.05; if (this.y > height + 100) this.y = -100; }
+            draw() {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(64, 224, 208, 0.3)';
+                ctx.lineWidth   = 2;
+                ctx.shadowBlur  = 30;
+                ctx.shadowColor = 'rgba(64, 224, 208, 0.8)';
+                ctx.beginPath();
+                for (let x = 0; x < width; x += 5) {
+                    const y = this.y + Math.sin(x * this.frequency + this.phase) * this.amplitude;
+                    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        class RotatingCube {
+            constructor() { this.rotation = { x: 0, y: 0, z: 0 }; this.size = 150; }
+            update() { this.rotation.x += 0.01; this.rotation.y += 0.015; this.rotation.z += 0.008; }
+            draw() {
+                ctx.save();
+                ctx.translate(width * 0.2, height * 0.7);
+                const verts = [[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
+                const rv = verts.map(([x, y, z]) => {
+                    let tY = y * Math.cos(this.rotation.x) - z * Math.sin(this.rotation.x);
+                    let tZ = y * Math.sin(this.rotation.x) + z * Math.cos(this.rotation.x);
+                    y = tY; z = tZ;
+                    let tX = x * Math.cos(this.rotation.y) + z * Math.sin(this.rotation.y);
+                    tZ = -x * Math.sin(this.rotation.y) + z * Math.cos(this.rotation.y);
+                    x = tX; z = tZ;
+                    return [x * this.size, y * this.size, z];
+                });
+                [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(([i, j]) => {
+                    const [x1, y1] = rv[i], [x2, y2] = rv[j];
+                    const g = ctx.createLinearGradient(x1, y1, x2, y2);
+                    g.addColorStop(0, 'rgba(255, 0, 128, 0.6)');
+                    g.addColorStop(1, 'rgba(255, 140, 0, 0.6)');
+                    ctx.strokeStyle = g;
+                    ctx.lineWidth   = 3;
+                    ctx.shadowBlur  = 20;
+                    ctx.shadowColor = 'rgba(255, 0, 128, 0.8)';
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                });
+                ctx.restore();
+            }
+        }
+
+        const particles = Array.from({ length: 150 }, () => new Particle());
+        const waves     = [new Wave(0.5), new Wave(0.7), new Wave(0.3)];
+        const cube      = new RotatingCube();
+
+        // ── Quotes ────────────────────────────────────────────────────────────
+        const quotes = [
+            { text: "Time is the coin of your life. You spend it. Do not allow others to spend it for you.", author: "Carl Sandburg" },
+            { text: "The trouble is, you think you have time.",                                              author: "Buddha" },
+            { text: "Lost time is never found again.",                                                       author: "Benjamin Franklin" },
+            { text: "Time flies over us, but leaves its shadow behind.",                                     author: "Nathaniel Hawthorne" },
+            { text: "Don't watch the clock; do what it does. Keep going.",                                   author: "Sam Levenson" },
+            { text: "The future is something which everyone reaches at the rate of 60 minutes an hour.",     author: "C.S. Lewis" },
+            { text: "Time is what we want most, but what we use worst.",                                     author: "William Penn" },
+            { text: "Your time is limited, don't waste it living someone else's life.",                      author: "Steve Jobs" },
+            { text: "The two most powerful warriors are patience and time.",                                  author: "Leo Tolstoy" },
+            { text: "Time you enjoy wasting is not wasted time.",                                            author: "Marthe Troly-Curtin" }
+        ];
+        let quoteIndex = 0;
+
+        function changeQuote() {
+            quoteIndex = (quoteIndex + 1) % quotes.length;
+            ['quote', 'author'].forEach(id => document.getElementById(id).style.opacity = '0');
+            setTimeout(() => {
+                document.getElementById('quote').textContent  = quotes[quoteIndex].text;
+                document.getElementById('author').textContent = '— ' + quotes[quoteIndex].author;
+                ['quote', 'author'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.style.transition = 'opacity 1s';
+                    el.style.opacity    = '1';
+                });
+            }, 500);
+        }
+
+        // ── Days-Lived: computed from localStorage birthdate or hidden ────────
+        function getDaysLived() {
+            const stored = localStorage.getItem('wallpaper_birthdate');
+            if (!stored) return null;
+            const birth = new Date(stored);
+            if (isNaN(birth.getTime())) return null;
+            const diff = Date.now() - birth.getTime();
+            return Math.floor(diff / (1000 * 60 * 60 * 24));
+        }
+
+        function updateDaysLived() {
+            const days = getDaysLived();
+            const el   = document.getElementById('daysLived');
+            const lbl  = document.getElementById('daysLabel');
+            if (days !== null) {
+                el.textContent  = days.toLocaleString();
+                lbl.textContent = 'Days Lived';
+            } else {
+                el.textContent  = '—';
+                lbl.textContent = 'Days Lived';
+            }
+        }
+
+        // ── Clock / Date / Stats ──────────────────────────────────────────────
+        function updateStats() {
+            const now = new Date();
+            const h   = String(now.getHours()).padStart(2, '0');
+            const m   = String(now.getMinutes()).padStart(2, '0');
+            const s   = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('time').textContent = `${h}:${m}:${s}`;
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+            document.getElementById('hoursToday').textContent = now.getHours();
+            const start     = new Date(now.getFullYear(), 0, 0);
+            const dayOfYear = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+            document.getElementById('dayOfYear').textContent  = dayOfYear;
+            document.getElementById('weekOfYear').textContent = Math.ceil(dayOfYear / 7);
+            updateDaysLived();
+        }
+
+        // ── Render Loop ───────────────────────────────────────────────────────
+        function animate() {
+            const g = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
+            g.addColorStop(0,   '#0a0015');
+            g.addColorStop(0.5, '#1a0030');
+            g.addColorStop(1,   '#000000');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, width, height);
+            waves.forEach(w => { w.update(); w.draw(); });
+            particles.forEach(p => { p.update(); p.draw(); });
+            cube.update();
+            cube.draw();
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        updateStats();
+        setInterval(updateStats, 1000);
+        setInterval(changeQuote, 25000);
+        animate();
+    </script>
+</body>
+</html>
