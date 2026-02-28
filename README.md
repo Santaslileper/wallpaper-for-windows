@@ -45,6 +45,8 @@ Download and launch the engine directly from your terminal:
 $d = "$env:USERPROFILE\Desktop\wallpaper-for-windows"
 irm https://github.com/Santaslileper/wallpaper-for-windows/archive/refs/heads/main.zip -OutFile "$env:TEMP\wp.zip"
 Expand-Archive "$env:TEMP\wp.zip" -DestinationPath $d -Force
+$s = (New-Object -COM WScript.Shell).CreateShortcut("$env:USERPROFILE\Desktop\Wallpaper for Windows.lnk")
+$s.TargetPath = "$d\wallpaper-for-windows-main\WallpaperManager.exe"; $s.WorkingDirectory = "$d\wallpaper-for-windows-main"; $s.Save()
 Start-Process "$d\wallpaper-for-windows-main\WallpaperManager.exe"
 ```
 
