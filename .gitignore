@@ -1,25 +1,36 @@
-# ── Automatically ignored files ──
-assets/data/
-*.exe
-!WallpaperManager.exe
-!tools/wall-renderer/bin/wall-renderer.exe
+# Wallpaper for Windows: Tracked Build Assets & Releases
 
-# ── Only keep these bundled wallpapers ──
-assets/wallpapers/**/*.html
-!assets/wallpapers/default.html
-!assets/wallpapers/temporal-flux.html
-!assets/wallpapers/memento-vivere.html
+# Ignore everything
+*
 
-# ── Logs & runtime cache ──
+# Allow directories
+!*/
+
+# Allow standard documentation
+!*.md
+!md/
+!md/**
+
+# Allow icons, previews, and themes
+!assets/
+!assets/**
+
+# Allow source code
+!src/
+!src/**
+
+# Allow executables and releases
+!*.exe
+!*.zip
+
+# EXPLICITLY IGNORE local caches, settings, and temporary logs
 *.log
-*.tmp
-debug_*.txt
-*.WebView2/
-
-# ── OS / IDE ──
-.DS_Store
-Thumbs.db
-desktop.ini
 .vscode/
-.idea/
-*.code-workspace
+bin/
+obj/
+assets/data/
+
+# Ensure specialized git folders are handled correctly
+.git/
+.github/
+! .github/**

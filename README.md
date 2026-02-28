@@ -1,126 +1,82 @@
 <div align="center">
 
 # 🖥️ Wallpaper for Windows
-### *Set any webpage as your live desktop wallpaper.*
+**"High-Performance HTML5 Live Desktop Engine"**
 
-[![Platform](https://img.shields.io/badge/platform-Windows-blue?logo=windows)](https://github.com/Santaslileper/wallpaper-for-windows)
-[![Language](https://img.shields.io/badge/language-C%23-239120?logo=csharp)](https://github.com/Santaslileper/wallpaper-for-windows)
-[![Renderer](https://img.shields.io/badge/renderer-Rust-orange?logo=rust)](https://github.com/Santaslileper/wallpaper-for-windows)
-[![License](https://img.shields.io/badge/license-Personal--Use--Only-red)](LICENSE)
-[![Status](https://img.shields.io/badge/status-active-brightgreen)](https://github.com/Santaslileper/wallpaper-for-windows)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%28x64%29-blue?style=flat-square&logo=windows)](https://github.com/Santaslileper/wallpaper-for-windows)
+[![Language](https://img.shields.io/badge/Language-C%23%20%2F%20Rust-orange?style=flat-square&logo=rust)](https://github.com/Santaslileper/wallpaper-for-windows)
+[![Renderer](https://img.shields.io/badge/Renderer-Embedded%20Chromium-brightgreen?style=flat-square)](https://github.com/Santaslileper/wallpaper-for-windows)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)](md/LICENSE.md)
 
-**Wallpaper for Windows** is a lightweight live wallpaper engine that renders any HTML file directly on your desktop — animated clocks, particle systems, quote carousels, 3D scenes, anything a browser can run.
+[Download Release](https://github.com/Santaslileper/wallpaper-for-windows/releases/latest) • [Source Code](src/) • [Bundled Themes](assets/wallpapers/) • [Report Bug](../../issues)
 
-[**Download Latest Release**](https://github.com/Santaslileper/wallpaper-for-windows/releases/latest) • [**Source Code**](src/WallpaperManager.cs) • [**Report a Bug**](../../issues)
+---
+
+<img src="assets/preview.png" width="850" alt="Wallpaper Manager Preview">
+
+Wallpaper for Windows is a system-integrated live wallpaper engine that enables the rendering of standard HTML5/JS/WebGL content directly on the desktop. By utilizing a hybrid C# and Rust architecture, it provides an efficient gateway for interactive and animated backgrounds with minimal resource consumption.
 
 ---
 
 </div>
 
-## 💡 Why This Exists
-
-Windows has no native live wallpaper support. Third-party solutions are bloated, paid, or require constant internet access. This engine is:
-
-- **Entirely local** — no internet required (except CDN-dependent wallpapers)
-- **Zero install** — just run the standalone `.exe` file, everything runs locally.
-- **Fully open** — HTML wallpapers are plain files you can read, edit, and create yourself
-- **Single Executable** — Written entirely in C# to ship as one `WallpaperManager.exe`
-
-### ✨ Key Features
-- **🎨 HTML Wallpapers:** Any `.html` file becomes a live, animated desktop background
-- **🖥️ Multi-Monitor:** Assign different wallpapers per monitor independently
-- **⚡ Rust Renderer:** Lightning fast, embedded Chromium-based window
-- **🔄 Auto-Restore:** Remembers your last wallpapers and restores them on startup
-- **🕹️ Game Mode:** Automatically hides wallpapers when a fullscreen app is detected
-- **📦 Portable:** No installer, no registry changes beyond optional autostart
+### 🛠️ Technical Specifications
+| **Component** | **Implementation Details** | **Notes** |
+| :--- | :--- | :--- |
+| **Control Shell** | .NET Framework 4.0 (`WallpaperManager.exe`) | Win32 Handle & UI Management |
+| **Renderer Engine** | Rust-based Chromium Embedded (`wall-renderer.exe`) | High-concurrency WebGL support |
+| **Display Injection** | Win32 `SetParent` / `Progman` hooks | Direct Desktop Plane rendering |
+| **Optimization** | Background Fullscreen Polling | GPU-suspend during high-load |
+| **Configuration** | Local JSON Persistence | 100% Offline |
 
 ---
 
-## ⚡ Quick Start
+### ✨ Core Features
+*   🎨 **HTML5 Native Support**: Render any local or remote `.html` file as your active desktop background.
+*   🖥️ **Multi-Monitor Logic**: Independent wallpaper assignment and scaling for complex workstation setups.
+*   ⚡ **Low-Latency Rendering**: Embedded Rust engine ensures smooth 60Hz+ animations for physics-based themes.
+*   🔄 **State Persistence**: Automated restoration of wallpaper history and monitor mapping on system boot.
+*   🕹️ **Game Mode Protocol**: Real-time monitoring of foreground windows to suspend rendering during fullscreen applications.
 
-Download and launch the engine directly from your terminal:
+---
+
+### 📂 Pre-Loaded Templates
+| **Template** | **Visual Characteristics** | **Resource Load** |
+| :--- | :--- | :--- |
+| **`default.html`** | Animated Gradient & Particle System | Low |
+| **`temporal-flux.html`** | Cyberpunk HUD with 3D Object Rotation | Medium |
+| **`memento.html`** | Minimalist Text Transformation | Minimal |
+
+---
+
+### ⚡ Build & Deployment
+Build the management shell using the native Windows C# compiler:
 
 ```powershell
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$d = "$env:USERPROFILE\Desktop\wallpaper-for-windows"
-irm https://github.com/Santaslileper/wallpaper-for-windows/archive/refs/heads/main.zip -OutFile "$env:TEMP\wp.zip"
-Expand-Archive "$env:TEMP\wp.zip" -DestinationPath $d -Force
-$s = (New-Object -COM WScript.Shell).CreateShortcut("$env:USERPROFILE\Desktop\Wallpaper for Windows.lnk")
-$s.TargetPath = "$d\wallpaper-for-windows-main\WallpaperManager.exe"; $s.WorkingDirectory = "$d\wallpaper-for-windows-main"; $s.Save()
-Start-Process "$d\wallpaper-for-windows-main\WallpaperManager.exe"
+# 1. Compile the Manager Shell
+& "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /target:winexe /win32icon:assets/icon.ico /out:"WallpaperManager.exe" "src/WallpaperManager.cs"
+
+# 2. Execute Primary Binary
+.\WallpaperManager.exe
 ```
 
-Or manually:
-1. Download the latest `wallpaper-for-windows` zip from the releases page.
-2. Extract the folder to your `Desktop` or `Documents`.
-3. Double-click `WallpaperManager.exe`.
+---
 
-> [!NOTE]
-> **What does this do?** It launches the manager. No installer, no admin rights, nothing hidden.
+### ⚠️ Privacy & Operational Notes
+> [!IMPORTANT]
+> **Network Integrity**: The core engine operates offline. External connections depend entirely on individual wallpaper payloads (e.g., CDN fonts or external API calls defined in your custom HTML).
 
 > [!TIP]
-> After launching, a small **control panel** appears. Pick a wallpaper from the dropdown, choose your monitor, and hit **LAUNCH**. Look for a running wallpaper window to appear behind your icons.
+> **Customization**: To add a new wallpaper, simply drop your HTML directory into `assets/wallpapers/`. The manager will automatically detect and list the new entry in the selection panel.
 
 ---
 
-## 🎨 Bundled Wallpapers
-
-| File | Description |
-| :--- | :--- |
-| `default.html` | Animated gradient + live clock + floating particles |
-| `temporal-flux.html` | Cyberpunk HUD — clock, 3D cube, quote carousel |
-| `memento-vivere.html` | Philosophical dark wallpaper — quote rotation |
-
----
-
-## 🚀 Releases & Fast Info
-
-| Item | Details |
-| :--- | :--- |
-| **Engine** | Single C# WinForms executable (`WallpaperManager.exe`) |
-| **Renderer** | Rust (`wall-renderer.exe`) — embedded Chromium-based window |
-| **Requirement** | Windows 10 / 11, .NET Framework 4.0+ |
-| **Install Type** | Portable — no installer, no admin rights needed |
-| **Autostart** | Optional — toggle in Settings panel inside the app |
-
----
-
-## ⚙️ How It Works
-
-1. **Manager** (`WallpaperManager.exe`) provides a dark-mode GUI to browse and launch wallpapers.
-2. **Renderer** (`wall-renderer.exe`) opens a borderless Chromium window and places it behind desktop icons using Windows `SetParent` API.
-3. **Wallpaper HTML** runs in the renderer — full JS, CSS animations, Canvas, WebGL.
-4. **Game Mode** polls the foreground window every second; if a fullscreen app is detected on a monitor, the wallpaper on that monitor is hidden to save GPU.
-
----
-
-## 📁 Project Structure
-
-```
-wallpaper-for-windows/
-├── WallpaperManager.exe         ← Main app (double-click to start)
-├── assets/
-│   ├── icon.ico                 ← App icon
-│   ├── data/                    ← settings.json (auto-created, gitignored)
-│   └── wallpapers/
-│       ├── default.html
-│       ├── temporal-flux.html
-│       └── memento-vivere.html
-└── tools/
-    └── wall-renderer/
-        └── bin/
-            └── wall-renderer.exe ← Pre-built Rust renderer
-```
-
----
-
-## ⚖️ License & Privacy
-
-- **License:** Personal Use Only. Non-commercial use permitted. No redistribution without written consent.
-- **Privacy:** 100% offline. No telemetry, no network calls (except CDN fonts/libs used by individual wallpapers). All settings and memory states stay strictly on your local machine.
-
----
+### ⚖️ License
+Released under **Proprietary (Structured Freedom)** specifications. 
+See [md/LICENSE.md](md/LICENSE.md) for full terms and usage permissions.
 
 <div align="center">
-Created with ❤️ by <b>Santaslileper</b>
+  
+[Santaslileper](https://github.com/Santaslileper)
+
 </div>
