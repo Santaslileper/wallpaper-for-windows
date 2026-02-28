@@ -78,6 +78,7 @@ Or manually:
 | **Engine** | Single C# WinForms executable (`WallpaperManager.exe`) |
 | **Renderer** | Rust (`wall-renderer.exe`) — embedded Chromium-based window |
 | **Requirement** | Windows 10 / 11, .NET Framework 4.0+ |
+| **Dependency** | [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download-section) *(Pre-installed on Win 11)* |
 | **Install Type** | Portable — no installer, no admin rights needed |
 | **Autostart** | Optional — toggle in Settings panel inside the app |
 
