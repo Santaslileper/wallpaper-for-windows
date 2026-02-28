@@ -1,33 +1,22 @@
-# ── User-specific data ────────────────────────────────────────────────
-assets/data/settings.json
-settings.json
-
-# ── Compiled binaries: ship both executables ──────────────────────────
+# ── Automatically ignored files ──
+assets/data/
 *.exe
 !WallpaperManager.exe
 !tools/wall-renderer/bin/wall-renderer.exe
 
-# ── Wallpapers: only the 3 sanitised generic wallpapers are pushed ─────
+# ── Only keep these bundled wallpapers ──
 assets/wallpapers/**/*.html
 !assets/wallpapers/default.html
 !assets/wallpapers/temporal-flux.html
 !assets/wallpapers/memento-vivere.html
 
-# ── Rust build artifacts ───────────────────────────────────────────────
-tools/wall-renderer/target/
-*.pdb
-
-
-# ── Logs & temp files ─────────────────────────────────────────────────
+# ── Logs & runtime cache ──
 *.log
 *.tmp
-*.WebView2/
 debug_*.txt
-stderr.txt
-stdout.txt
-tools/comments.csv
+*.WebView2/
 
-# ── OS / IDE ──────────────────────────────────────────────────────────
+# ── OS / IDE ──
 .DS_Store
 Thumbs.db
 desktop.ini
